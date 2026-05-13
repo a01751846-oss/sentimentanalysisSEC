@@ -1,7 +1,7 @@
 
 ## App Preview
 
-![SEC Analyzer App](images/app_preview.png)
+![SEC Analyzer App](app_preview.png)
 # SEC Investment Sentiment Analyzer
 
 AI-powered sentiment analysis for SEC-style financial documents using Qwen2 0.5B Instruct.
