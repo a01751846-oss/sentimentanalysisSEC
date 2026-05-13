@@ -1,64 +1,80 @@
-import requests
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# =====================================
-# MODELO
-# =====================================
+# ==========================
+# LOAD MODEL
+# ==========================
 
-pipe = pipeline(
-    "text-generation",
-    model="Qwen/Qwen2-0.5B-Instruct"
-)
+model_name = "Qwen/Qwen2-0.5B-Instruct"
 
-# =====================================
-# DOCUMENTO DE PRUEBA
-# =====================================
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-url = "https://www.gutenberg.org/files/1342/1342-0.txt"
+model = AutoModelForCausalLM.from_pretrained(model_name)
 
-response = requests.get(url)
+# ==========================
+# FILE INPUT
+# ==========================
 
-text = response.text
+file_path = input("\nEnter SEC file path (.txt): ")
 
-# recortar texto
+with open(file_path, "r", encoding="utf-8") as file:
+    text = file.read()
+
+# ==========================
+# LIMIT TEXT SIZE
+# ==========================
+
 text = text[:3000]
 
-# =====================================
-# PROMPT FINANCIERO
-# =====================================
+# ==========================
+# PROMPT
+# ==========================
 
 prompt = f"""
-You are a financial analyst.
+You are an AI financial analyst.
 
-Analyze the sentiment of this document.
+Analyze the following SEC filing.
 
-Return ONLY:
+Respond ONLY in this format:
 
-1. Overall Sentiment
-2. Risks
-3. Positive Indicators
-4. Investment Opinion
+Sentiment:
+Risks:
+Positive Indicators:
+Investment Recommendation:
 
-Text:
+SEC Filing:
 {text}
 """
 
-# =====================================
-# GENERAR
-# =====================================
+# ==========================
+# TOKENIZE
+# ==========================
 
-result = pipe(
-    prompt,
-    max_new_tokens=120,
-    do_sample=False
+inputs = tokenizer(prompt, return_tensors="pt")
+
+# ==========================
+# GENERATE
+# ==========================
+
+outputs = model.generate(
+    **inputs,
+    max_new_tokens=80
 )
 
-# =====================================
+# ==========================
+# DECODE
+# ==========================
+
+response = tokenizer.decode(
+    outputs[0],
+    skip_special_tokens=True
+)
+
+# ==========================
 # OUTPUT
-# =====================================
+# ==========================
 
 print("\n====================")
-print("AI INVESTMENT ANALYSIS")
+print("SEC ANALYSIS")
 print("====================\n")
 
-print(result[0]["generated_text"])
+print(response)
