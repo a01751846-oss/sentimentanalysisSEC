@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ## App Preview
 
 ![SEC Analyzer App](images/app_preview.png)
